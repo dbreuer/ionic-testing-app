@@ -1,0 +1,28 @@
+format_version: "5"
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: ionic
+app:
+  envs:
+  - IONIC_PLATFORM: ios
+trigger_map:
+- push_branch: '*'
+  workflow: primary
+- pull_request_source_branch: '*'
+  workflow: primary
+workflows:
+  primary:
+    steps:
+    - activate-ssh-key:
+        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+    - git-clone: {}
+    - script:
+        title: Do anything with Script step
+    - certificate-and-profile-installer: {}
+    - yarn@0.0.7:
+        inputs:
+        - command: install
+    - generate-cordova-build-configuration: {}
+    - ionic-archive:
+        inputs:
+        - platform: $IONIC_PLATFORM
+    - deploy-to-bitrise-io: {}
